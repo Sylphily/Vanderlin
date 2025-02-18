@@ -954,7 +954,7 @@
 	slot_flags = ITEM_SLOT_BACK_R|ITEM_SLOT_CLOAK
 	body_parts_covered = CHEST|GROIN|VITALS
 	allowed_sex = list(MALE, FEMALE)
-	allowed_race = list("human", "tiefling", "elf", "aasimar", "dwarf")
+	// allowed_race = list("human", "tiefling", "elf", "aasimar", "dwarf")
 	sleeved = 'icons/roguetown/clothing/onmob/cloaks.dmi'
 	nodismemsleeves = TRUE
 	boobed = FALSE
@@ -1004,6 +1004,48 @@
 		for(var/obj/item/I in things)
 			STR.remove_from_storage(I, get_turf(src))
 
+/obj/item/clothing/cloak/half/guard
+	name = "guard's half cloak"
+	color = CLOTHING_PLUM_PURPLE
+	icon_state = "guardcloak"
+	allowed_race = ALL_RACES_LIST
+
+/obj/item/clothing/cloak/half/guard/Initialize()
+	. = ..()
+	if(GLOB.lordprimary)
+		lordcolor(GLOB.lordprimary,GLOB.lordsecondary)
+	else
+		GLOB.lordcolor += src
+
+/obj/item/clothing/cloak/half/guard/lordcolor(primary,secondary)
+	if(primary)
+		color = primary
+
+/obj/item/clothing/cloak/half/guard/Destroy()
+	GLOB.lordcolor -= src
+	return ..()
+
+/obj/item/clothing/cloak/half/guardsecond
+	name = "guard's half cloak"
+	color = CLOTHING_BLOOD_RED
+	icon_state = "guardcloak"
+	allowed_race = ALL_RACES_LIST
+
+/obj/item/clothing/cloak/half/guardsecond/Initialize()
+	. = ..()
+	if(GLOB.lordprimary)
+		lordcolor(GLOB.lordprimary,GLOB.lordsecondary)
+	else
+		GLOB.lordcolor += src
+
+/obj/item/clothing/cloak/half/guardsecond/lordcolor(primary,secondary)
+	if(secondary)
+		color = secondary
+
+/obj/item/clothing/cloak/half/guardsecond/Destroy()
+	GLOB.lordcolor -= src
+	return ..()
+
 /obj/item/clothing/cloak/half/shadowcloak
 	name = "stalker cloak"
 	desc = "A heavy leather cloak held together by a gilded pin. The pin depicts a spider with disconnected legs."
@@ -1035,8 +1077,6 @@
 	name = "town watch cloak"
 	icon_state = "guardcloak"
 	color = CLOTHING_BLOOD_RED
-	allowed_sex = list(MALE)
-	allowed_race = list("human", "tiefling", "aasimar")
 	inhand_mod = FALSE
 
 /obj/item/clothing/cloak/half/vet/Initialize()

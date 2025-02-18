@@ -3,7 +3,7 @@
 	name = "pot"
 	desc = "The peasants friend, when filled with boiling water it will turn the driest oats to filling oatmeal."
 
-	icon = 'modular/Neu_Food/icons/cooking.dmi'
+	icon = 'icons/roguetown/items/cooking.dmi'
 	icon_state = "pote"
 
 	sharpness = IS_BLUNT
@@ -14,6 +14,9 @@
 	var/list/in_progress_recipes = list() //these are unique creations only ever used
 
 	var/static/list/checker_recipes = list()
+
+/obj/item/reagent_containers/glass/bucket/pot/copper
+	icon_state = "pote_copper"
 
 /obj/item/reagent_containers/glass/bucket/pot/Destroy()
 	. = ..()
@@ -83,13 +86,13 @@
 	cut_overlays()
 	if(reagents.total_volume > 0)
 		if(reagents.total_volume <= 50)
-			var/mutable_appearance/filling = mutable_appearance('modular/Neu_Food/icons/cooking.dmi', "pote_half")
+			var/mutable_appearance/filling = mutable_appearance('icons/roguetown/items/cooking.dmi', "pote_half")
 			filling.color = mix_color_from_reagents(reagents.reagent_list)
 			filling.alpha = mix_alpha_from_reagents(reagents.reagent_list)
 			add_overlay(filling)
 
 		if(reagents.total_volume > 50)
-			var/mutable_appearance/filling = mutable_appearance('modular/Neu_Food/icons/cooking.dmi', "pote_full")
+			var/mutable_appearance/filling = mutable_appearance('icons/roguetown/items/cooking.dmi', "pote_full")
 			filling.color = mix_color_from_reagents(reagents.reagent_list)
 			filling.alpha = mix_alpha_from_reagents(reagents.reagent_list)
 			add_overlay(filling)
@@ -99,7 +102,7 @@
 	if(istype(I, /obj/item/reagent_containers/glass/bowl))
 		to_chat(user, "<span class='notice'>Filling the bowl...</span>")
 		playsound(user, pick('sound/foley/waterwash (1).ogg','sound/foley/waterwash (2).ogg'), 70, FALSE)
-		if(do_after(user,2 SECONDS, target = src))
+		if(do_after(user, 2 SECONDS, src))
 			reagents.trans_to(I, reagents.total_volume)
 	return TRUE
 
@@ -234,21 +237,25 @@
 /datum/pot_recipe/cooking/chicken_stew/cutlet
 	required_items = list(/obj/item/reagent_containers/food/snacks/rogue/meat/poultry/cutlet = 1)
 
-/datum/pot_recipe/cooking/spider_stew
-	name = "spider stew"
+/datum/pot_recipe/cooking/questionable_stew
+	name = "questionable stew"
 	cooking_time = 90 SECONDS
 	produced_reagent = /datum/reagent/consumable/soup/stew/gross
-	required_items = list(/obj/item/reagent_containers/food/snacks/rogue/meat/spider = 1)
+	required_items = list(/obj/item/reagent_containers/food/snacks/rogue/meat/strange = 1)
 	finished_smell = /datum/pollutant/food/potato_stew
 
 /datum/pot_recipe/cooking/generic_meat_stew
 	name = "meat stew"
 	cooking_time = 90 SECONDS
 	produced_reagent = /datum/reagent/consumable/soup/stew/meat
+//	required_items = list(/obj/item/reagent_containers/food/snacks/rogue/meat/mince/beef = 1)
 	required_items = list(/obj/item/reagent_containers/food/snacks/rogue/meat = 1)
 	finished_smell = /datum/pollutant/food/meat_stew
 	fallback = TRUE
-
+/*
+/datum/pot_recipe/cooking/generic_meat_stew/steak
+	required_items = list(/obj/item/reagent_containers/food/snacks/rogue/meat/steak = 1)
+*/
 /datum/pot_recipe/cooking/egg_soup
 	name = "egg soup"
 	cooking_time = 80 SECONDS
@@ -260,7 +267,7 @@
 	name = "truffle stew"
 	cooking_time = 80 SECONDS
 	produced_reagent = /datum/reagent/consumable/soup/stew/truffle
-	required_items = list(/obj/item/reagent_containers/food/snacks/rogue/truffles = 1)
+	required_items = list(/obj/item/reagent_containers/food/snacks/truffles = 1)
 	finished_smell = /datum/pollutant/food/truffle_stew
 
 /datum/pot_recipe/cooking/cheese_soup
@@ -271,14 +278,48 @@
 	finished_smell = /datum/pollutant/food/cheese_soup
 
 /datum/pot_recipe/cooking/cheese_soup/wedge
-	required_items = list(/obj/item/reagent_containers/food/snacks/rogue/cheddarwedge = 1)
+	required_items = list(/obj/item/reagent_containers/food/snacks/cheese_wedge = 1)
 
 /datum/pot_recipe/drugs
+	abstract_type = /datum/pot_recipe/drugs
+
+/datum/pot_recipe/drugs/drukqs
 	name = "drukqs"
 	cooking_time = 50 SECONDS
 	water_conversion = 0.45
 	produced_reagent = /datum/reagent/druqks
 	required_items = list(/obj/item/reagent_containers/powder/spice = 1)
+	finished_smell = /datum/pollutant/food/druqks
+	pollute_amount = 100
+
+/datum/pot_recipe/drugs/post_recipe()
+	var/remaining_water = water_volume - CEILING(water_volume * water_conversion, 1)
+	cooking_pot.reagents.add_reagent(/datum/reagent/water/spicy, remaining_water)
+
+/datum/pot_recipe/drugs/ozium
+	name = "ozium"
+	cooking_time = 50 SECONDS
+	water_conversion = 0.45
+	produced_reagent = /datum/reagent/ozium
+	required_items = list(/obj/item/reagent_containers/powder/ozium = 1)
+	finished_smell = /datum/pollutant/food/druqks
+	pollute_amount = 100
+
+/datum/pot_recipe/drugs/moondust
+	name = "moondust"
+	cooking_time = 50 SECONDS
+	water_conversion = 0.45
+	produced_reagent = /datum/reagent/moondust
+	required_items = list(/obj/item/reagent_containers/powder/moondust = 1)
+	finished_smell = /datum/pollutant/food/druqks
+	pollute_amount = 100
+
+/datum/pot_recipe/drugs/moondust_purest
+	name = "pure moondust"
+	cooking_time = 50 SECONDS
+	water_conversion = 0.45
+	produced_reagent = /datum/reagent/moondust_purest
+	required_items = list(/obj/item/reagent_containers/powder/moondust_purest = 1)
 	finished_smell = /datum/pollutant/food/druqks
 	pollute_amount = 100
 
